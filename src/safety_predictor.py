@@ -12,6 +12,7 @@ class ConstructionSafetyPredictor:
     """AI model for predicting construction site safety risks."""
     
     def __init__(self):
+        """Initialize the predictor"""
         self.model = RandomForestClassifier(n_estimators=100, random_state=42)
         self.scaler = StandardScaler()
     
@@ -66,32 +67,13 @@ class ConstructionSafetyPredictor:
     
     def plot_risk_factors(self):
         """Visualize importance of different risk factors"""
-        importance = self.model.feature_importances_
-        features = ['Working Height', 'Workers Present', 'Equipment Count',
-                   'Temperature', 'Wind Speed', 'Hours Worked', 'Safety Measures']
-        
-        plt.figure(figsize=(10, 6))
-        sns.barplot(x=importance, y=features)
-        plt.title('Risk Factors Importance in Safety Prediction')
-        plt.xlabel('Importance Score')
-        plt.savefig('images/risk_factors.png')
-        plt.show()
-    
-    def plot_risk_distribution(self, df):
-        """Plot risk distribution across different factors"""
-        plt.figure(figsize=(12, 6))
-        sns.scatterplot(data=df, x='working_height', y='workers_present',
-                       hue='risk_level', size='equipment_count')
-        plt.title('Risk Distribution by Working Height and Workers Present')
-        plt.savefig('images/risk_distribution.png')
-        plt.show()
-    
-    def plot_risk_factors(self):
-        """Visualize importance of different risk factors"""
         # Get absolute path
         current_dir = os.path.dirname(os.path.abspath(__file__))
         project_dir = os.path.dirname(current_dir)
         image_path = os.path.join(project_dir, 'images', 'risk_factors.png')
+        
+        # Create images directory if it doesn't exist
+        os.makedirs(os.path.dirname(image_path), exist_ok=True)
         
         importance = self.model.feature_importances_
         features = ['Working Height', 'Workers Present', 'Equipment Count',
@@ -111,6 +93,9 @@ class ConstructionSafetyPredictor:
         project_dir = os.path.dirname(current_dir)
         image_path = os.path.join(project_dir, 'images', 'risk_distribution.png')
         
+        # Create images directory if it doesn't exist
+        os.makedirs(os.path.dirname(image_path), exist_ok=True)
+        
         plt.figure(figsize=(12, 6))
         sns.scatterplot(data=df, x='working_height', y='workers_present',
                        hue='risk_level', size='equipment_count')
@@ -118,8 +103,8 @@ class ConstructionSafetyPredictor:
         plt.savefig(image_path)
         plt.show()
 
-
 def main():
+    """Main function to run the predictor"""
     print("Construction Safety Risk Predictor")
     print("-" * 30)
     
@@ -139,9 +124,18 @@ def main():
     predictor.plot_risk_factors()
     predictor.plot_risk_distribution(df)
     
-    # Calculate accuracy
+    # Calculate and display accuracy
     accuracy = accuracy_score(y_test, y_pred) * 100
     print(f"\nModel Accuracy: {accuracy:.2f}%")
+    
+    # Display feature importance
+    importance = predictor.model.feature_importances_
+    features = ['Working Height', 'Workers Present', 'Equipment Count',
+               'Temperature', 'Wind Speed', 'Hours Worked', 'Safety Measures']
+    
+    print("\nFeature Importance:")
+    for feature, imp in zip(features, importance):
+        print(f"{feature}: {imp:.4f}")
 
 if __name__ == "__main__":
     main()
